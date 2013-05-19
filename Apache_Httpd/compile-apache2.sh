@@ -11,15 +11,35 @@
 #VARIABILI
 ##########################################################
 
+echo "checking if tomcat connectors exist"
+
+if [ $(ls | grep -c connectors) -eq 0 ]
+then 
+    echo "please download tomcat-connectors source archive from the link written in the README file"
+exit 10
+fi
 
 
-APACHEVER="httpd-2.4.4"
+echo "checking last apache 2.4.x version and downloading it"
+
+APACHEVER="$(curl http://httpd.apache.org/download.cgi#apache24 | grep 2.4.* | grep gz | grep -i unix | cut -d= -f2 | cut -d">" -f1 | sed -e 's/"//g' | cut -d"/" -f6)"
+
+wget $(curl http://httpd.apache.org/download.cgi#apache24 | grep 2.4.* | grep gz | grep -i unix | cut -d= -f2 | cut -d">" -f1 | sed -e 's/"//g')
+
+if [ $? -ne 0 ]
+then
+echo "error while getting last apache source archive, download it manually and change APACHEVER variable value"
+exit 11
+fi
+
+
+#APACHEVER="httpd-2.4.4"
 JKVER="tomcat-connectors-1.2.37-src"
 INITAPACHE="/etc/init.d/httpd2"
 INSTALLATION_HOME=$(pwd)
 JKPKG="$JKVER.tar.gz"
 JKDIR="$JKVER"
-APACHEPKG="$APACHEVER.tar.gz"
+APACHEPKG="$APACHEVER"
 APACHEDIR="$APACHEVER"
 
 
