@@ -24,7 +24,7 @@ APACHEDIR="$APACHEVER"
 
 
 
-echo "Inizio compilazione di Apache $APACHEVER  con modulo shared di mod_jk $JKVER (script written by Luca Zecca °.°)"
+echo "Inizio compilazione di Apache $APACHEVER  con modulo shared di mod_jk $JKVER"
 sleep 3
 
 
