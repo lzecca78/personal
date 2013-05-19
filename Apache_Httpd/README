@@ -1,6 +1,8 @@
 Before start compiling, read the following points :
 
-1)download latest httpd  2.4.x  source archive in gz format from :
+1)With the latest version of the compiling script, should not be necessary the manual download of the httpd source archive, anyway i put the link for any reasons :) :
+
+download latest httpd  2.4.x  source archive in gz format from :
 http://httpd.apache.org/download.cgi#apache24
 
 2)download latest tomcat connectors source archive in gz format from :
