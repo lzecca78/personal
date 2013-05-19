@@ -1,0 +1,8 @@
+Before start compiling, read the following points :
+
+1)download latest httpd  2.4.x  source archive in gz format from :
+http://httpd.apache.org/download.cgi#apache24
+
+2)download latest tomcat connectors source archive in gz format from :
+
+http://tomcat.apache.org/connectors-doc/
