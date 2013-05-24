@@ -1,0 +1,19 @@
+#!/bin/bash
+
+GIT_CUSTOM_COMPLETION="http://repo.or.cz/w/git.git/blob_plain/HEAD:/contrib/completion/git-completion.bash"
+
+echo "backing up home .bashrc file"
+
+cp ~/.bashrc ~/.bashrc_$(date +%F_%H_%M)
+
+
+cd ~
+wget $GIT_CUSTOM_COMPLETION
+
+
+echo "green=$(tput setaf 2)" >> ~/.bashrc
+echo "blue=$(tput setaf 4)" >> ~/.bashrc
+echo "bold=$(tput bold)" >> ~/.bashrc
+echo "red=$(tput setaf 1)" >> ~/.bashrc
+echo "reset=$(tput sgr0)" >> ~/.bashrc
+echo "PS1='\u@\[$green\]\h\[$reset\]:\w\[$blue\]$(__git_ps1)\[$reset\] \$ '" >> ~/.bashrc
