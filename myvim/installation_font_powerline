@@ -1,0 +1,2 @@
+#!/bin/bash
+git clone git://gist.github.com/1630581.git ~/.fonts/ttf-dejavu-powerline
