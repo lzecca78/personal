@@ -26,9 +26,7 @@ end
 
 # methods
 
-
 def __port_is_open?(ip, port, seconds)
-
   begin
     Timeout::timeout(seconds) do
     begin
@@ -47,6 +45,8 @@ def IpFromName(domain)
   ip=Resolv.getaddress domain
   return ip
 end
+
+##script
 
 my_file =File.open("connectivity.ini",{:row_sep => "\r\n"})
 @Deduplicate={}
@@ -79,4 +79,3 @@ end
   end
 end
 my_file.close
-
