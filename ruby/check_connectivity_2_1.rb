@@ -74,7 +74,7 @@ end
   hostIp=ip.split('-')[0]
   if __port_is_open?(hostIp, portIp, 1, host).nil?
     then
-      puts "[ ERROR:PORT:#{portIp} ] on port #{portIp} for #{host} on #{hostIp} #{__port_is_open?(hostIp, portIp, 1, host)}"
+      puts "[ ERROR:PORT:#{portIp} ] on port #{portIp} for #{host} on #{hostIp} "
     else
       puts "[ OK ] check on port #{portIp} for #{host}"
   end
