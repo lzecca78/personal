@@ -31,22 +31,53 @@ rescue LoadError
       system("gem install resolv")
 end
 
+require 'pp'
+require 'net/http'
+require 'net/https'
+# global variables
+@timeoutSeconds=3
+
 # methods
 
-def __port_is_open?(ip, port, seconds, domain)
-  begin
-    Timeout::timeout(seconds) do
+def portIsOpen?(ip, port, domain)
+    begin
+    Timeout::timeout(@timeoutSeconds) do
         begin
-        s=TCPSocket.new(ip, port)
-        s.close
-        return true
+            s=TCPSocket.new(ip, port)
+            s.close
+            return true
         rescue
-          puts  "*******UNREACHABLE ******""[ERROR] caused by ""#{Errno::ECONNREFUSED; Errno::EHOSTUNREACH}"" from #{ip} that lookup to #{domain}"
-        return true
+            puts  "*******UNREACHABLE ******""[ERROR] caused by ""#{Errno::ECONNREFUSED; Errno::EHOSTUNREACH}"" from #{ip} that lookup to #{domain}"
+            return true
+         end
+        end
+    rescue Timeout::Error
     end
-  end
-  rescue Timeout::Error
 end
+
+def responseNotDesidered(url)
+    uri = URI(url)
+puts uri
+    begin
+        Timeout::timeout(@timeoutSeconds) do
+        begin
+            response = Net::HTTP.get_response(uri)
+            puts response.nil?
+        rescue
+            puts "ERROR while retriving response from #{url}"
+            return false
+        end
+        if response.code.match(/^4/) or response.code.match(/^5/)
+        then
+            puts "ERROR the response is #{response.code} from #{url}"
+            return false
+        end
+        end
+        return true
+    rescue 
+            puts "ERROR timeout raised while retriving response from #{url}"
+            return false
+    end
 end
 
 def IpFromName(domain)
@@ -81,7 +112,6 @@ end
 
 
 ##script
-puts fd
 @Deduplicate={}
 fd.each_line do|line|
     line.split('=')
@@ -93,22 +123,22 @@ fd.each_line do|line|
         line_noquotes = value.tr "\"|\'", ""
         URI("#{line_noquotes}").host.each_line do |domain|
             clear_domain=domain.sub!(/(\r?\n)*\z/, "")
-            if @Deduplicate.select{|host, ip|domain.match(host)}
-            then
-                @Deduplicate[clear_domain]= "#{IpFromName(clear_domain)}""-""#{URI("#{line_noquotes}").port}"
-            end
+            @Deduplicate[line_noquotes]= "#{IpFromName(clear_domain)}""-""#{URI("#{line_noquotes}").port}"
       end
     end
 end
 
 @Deduplicate.each do |host, ip|
-  portIp=ip.split('-')[1]
-  hostIp=ip.split('-')[0]
-  if __port_is_open?(hostIp, portIp, 1, host).nil?
+    portIp=ip.split('-')[1]
+    hostIp=ip.split('-')[0]
+    if portIsOpen?(hostIp, portIp, host).nil?
     then
-      puts "[ ERROR:PORT:#{portIp} ] on port #{portIp} for #{host} on #{hostIp} #{__port_is_open?(hostIp, portIp, 1, host)}"
+        puts "[ ERROR:PORT:#{portIp} ] on port #{portIp} and ip #{hostIp} from #{host}"
     else
-      puts "[ OK ] check on port #{portIp} for #{host}"
-  end
+        if responseNotDesidered(host)
+        then
+            puts "[ OK ] check on port #{portIp} for #{host}"
+        end
+    end
 end
 fd.close
