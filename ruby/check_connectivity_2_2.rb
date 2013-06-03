@@ -41,41 +41,40 @@ require 'net/https'
 
 def portIsOpen?(ip, port, domain)
     begin
-    Timeout::timeout(@timeoutSeconds) do
+    status = Timeout::timeout(@timeoutSeconds) {
         begin
             s=TCPSocket.new(ip, port)
             s.close
             return true
         rescue
-            puts  "*******UNREACHABLE ******""[ERROR] caused by ""#{Errno::ECONNREFUSED; Errno::EHOSTUNREACH}"" from #{ip} that lookup to #{domain}"
-            return true
+            puts  "    ERROR::socket_unreachable : caused by ""#{Errno::ECONNREFUSED; Errno::EHOSTUNREACH}"" from #{ip} that lookup to #{domain}"
+            return false
          end
-        end
+    }
     rescue Timeout::Error
+        return false
     end
 end
 
 def responseNotDesidered(url)
     uri = URI(url)
-puts uri
     begin
-        Timeout::timeout(@timeoutSeconds) do
+        status = Timeout::timeout(@timeoutSeconds) {
         begin
             response = Net::HTTP.get_response(uri)
-            puts response.nil?
         rescue
-            puts "ERROR while retriving response from #{url}"
+            puts "	ERROR::http_no_response : while retriving response from #{url}"
             return false
         end
         if response.code.match(/^4/) or response.code.match(/^5/)
         then
-            puts "ERROR the response is #{response.code} from #{url}"
+            puts "	ERROR::http_error_code the response is #{response.code} from #{url}"
             return false
         end
-        end
         return true
-    rescue 
-            puts "ERROR timeout raised while retriving response from #{url}"
+        }
+    rescue Timeout::Error
+            puts "	ERROR::network_timeout : timeout raised while retriving response from #{url}"
             return false
     end
 end
@@ -84,7 +83,7 @@ def IpFromName(domain)
   begin
   ip=Resolv.getaddress domain
   rescue
-    puts "[ERROR] while trying to obtain ipaddress from #{domain}"
+    puts "    ERROR::error_resolve : while trying to obtain ipaddress from #{domain}"
   end
   return ip
 end
@@ -133,11 +132,11 @@ end
     hostIp=ip.split('-')[0]
     if portIsOpen?(hostIp, portIp, host).nil?
     then
-        puts "[ ERROR:PORT:#{portIp} ] on port #{portIp} and ip #{hostIp} from #{host}"
+        puts "    ERROR::socket_port : PORT:#{portIp} ] on port #{portIp} and ip #{hostIp} from #{host}"
     else
         if responseNotDesidered(host)
         then
-            puts "[ OK ] check on port #{portIp} for #{host}"
+            puts "OK : check on port #{portIp} for #{host}"
         end
     end
 end
