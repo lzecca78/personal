@@ -1,6 +1,13 @@
-#!/bin/env ruby
+#!/usr/bin/env ruby
 
 #handle missing libraries
+begin
+      require 'rubygems'
+rescue LoadError
+      system("gem install rubygems")
+end
+
+
 begin
       require 'socket'
 rescue LoadError
@@ -43,13 +50,17 @@ end
 end
 
 def IpFromName(domain)
+  begin
   ip=Resolv.getaddress domain
+  rescue
+    puts "[ERROR] while trying to obtain ipaddress from #{domain}"
+  end
   return ip
 end
 
 ##script
 
-my_file =File.open("connectivity.ini",{:row_sep => "\r\n"})
+my_file =File.open("connectivity.ini")
 @Deduplicate={}
 my_file.each_line do|line|
 line.split('=')
@@ -63,12 +74,12 @@ line.split('=')
       clear_domain=domain.sub!(/(\r?\n)*\z/, "")
      if @Deduplicate.select{|host, ip|domain.match(host)}
       then
-       @Deduplicate[clear_domain]= "#{Resolv.getaddress(clear_domain)}""-""#{URI("#{line_noquotes}").port}"
+       @Deduplicate[clear_domain]= "#{IpFromName(clear_domain)}""-""#{URI("#{line_noquotes}").port}"
+      end
       end
       end
 end
 
-end
 @Deduplicate.each do |host, ip|
   portIp=ip.split('-')[1]
   hostIp=ip.split('-')[0]
