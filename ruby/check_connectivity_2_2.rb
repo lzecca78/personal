@@ -31,15 +31,25 @@ rescue LoadError
       system("gem install resolv")
 end
 
+require 'csv'
 require 'pp'
 require 'net/http'
 require 'net/https'
 # global variables
 @timeoutSeconds=3
-
+@fileParsed=''
+@NOT_NECESSARY=''
 # methods
 
+def csvAddRow(status=@NOT_NECESSARY, typeOfStatus=@NOT_NECESSARY, ip=@NOT_NECESSARY, fqdn=@NOT_NECESSARY, responseHttp=@NOT_NECESSARY)
+CSV::Writer.generate(@csvFile).add_row([status,typeOfStatus,ip,fqdn,responseHttp])
+end
+
 def portIsOpen?(ip, port, domain)
+  if ip.nil?
+    then
+    return false
+  end
     begin
     status = Timeout::timeout(@timeoutSeconds) {
         begin
@@ -48,6 +58,7 @@ def portIsOpen?(ip, port, domain)
             return true
         rescue
             puts  "    ERROR::socket_unreachable : caused by ""#{Errno::ECONNREFUSED; Errno::EHOSTUNREACH}"" from #{ip} that lookup to #{domain}"
+            csvAddRow('ERROR','socket_unreachable',ip,domain, @NOT_NECESSARY)
             return false
          end
     }
@@ -58,23 +69,29 @@ end
 
 def responseNotDesidered(url)
     uri = URI(url)
+    response = ''
     begin
         status = Timeout::timeout(@timeoutSeconds) {
         begin
             response = Net::HTTP.get_response(uri)
         rescue
             puts "	ERROR::http_no_response : while retriving response from #{url}"
+            csvAddRow('ERROR','http_no_response',@NOT_NECESSARY,url, @NOT_NECESSARY)
             return false
         end
         if response.code.match(/^4/) or response.code.match(/^5/)
         then
             puts "	ERROR::http_error_code the response is #{response.code} from #{url}"
+            csvAddRow('ERROR','http_error_code',@NOT_NECESSARY,url, response.code)
             return false
         end
+        puts "OK : check on port #{URI(url).port} for #{URI(url).host}"
+        csvAddRow('OK',@NOT_NECESSARY,@NOT_NECESSARY,URI(url), response.code)
         return true
         }
     rescue Timeout::Error
             puts "	ERROR::network_timeout : timeout raised while retriving response from #{url}"
+            csvAddRow('ERROR','network_timeout',@NOT_NECESSARY,url,@NOT_NECESSARY)
             return false
     end
 end
@@ -84,6 +101,7 @@ def IpFromName(domain)
   ip=Resolv.getaddress domain
   rescue
     puts "    ERROR::error_resolve : while trying to obtain ipaddress from #{domain}"
+            csvAddRow('ERROR','error_resolve',@NOT_NECESSARY,domain, @NOT_NECESSARY)
   end
   return ip
 end
@@ -99,17 +117,24 @@ end
 
 ARGV.each do |myFile|
     puts "Using #{myFile}"
-    begin   
+    begin
+      @fileParsed=myFile
         fd = File.open(myFile)
-    rescue 
+    rescue
         puts "Usage:  ruby check_connectivity_<version>_<version>.rb <path_ini_file>"
         exit 2
-    end    
+    end
 end
 
 
+timeToString = Time.new.strftime('%Y%m%d%H%M%S')
+
+@csvFile = File.open(File.basename(@fileParsed) + timeToString +'.csv', 'w')
+puts @csvFile.path
 
 
+#create index of csv
+CSV::Writer.generate(@csvFile).add_row(['STATUS','TYPE','IP', 'FQDNq','HTTP STATUS'])
 ##script
 @Deduplicate={}
 fd.each_line do|line|
@@ -133,11 +158,10 @@ end
     if portIsOpen?(hostIp, portIp, host).nil?
     then
         puts "    ERROR::socket_port : PORT:#{portIp} ] on port #{portIp} and ip #{hostIp} from #{host}"
+            csvAddRow('ERROR','socket_port',hostIp,host,@NOT_NECESSARY)
     else
-        if responseNotDesidered(host)
-        then
-            puts "OK : check on port #{portIp} for #{host}"
-        end
+         responseNotDesidered(host)
     end
 end
 fd.close
+@csvFile.close
