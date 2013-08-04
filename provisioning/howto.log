@@ -1,0 +1,1 @@
+mkdir -p modules/php/{depends,file,manifests/install,templates}
