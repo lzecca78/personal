@@ -29,7 +29,7 @@ SERVERALIAS=$IPADDY
  apt-get -qq update
 
 # Install Pre-Reqs
- apt-get -y install git curl apache2 libcurl4-openssl-dev apache2-prefork-dev libapr1-dev libcurl4-openssl-dev apache2-prefork-dev libapr1-dev build-essential openssl libreadline6 libreadline6-dev curl git-core zlib1g zlib1g-dev libssl-dev libyaml-dev libsqlite3-dev sqlite3 libxml2-dev libxslt-dev autoconf libc6-dev ncurses-dev automake libtool bison subversion pkg-config python-software-properties software-properties-common
+apt-get -y install git curl apache2 libcurl4-openssl-dev apache2-prefork-dev libapr1-dev libcurl4-openssl-dev apache2-prefork-dev libapr1-dev build-essential openssl libreadline6 libreadline6-dev curl git-core zlib1g zlib1g-dev libssl-dev libyaml-dev libsqlite3-dev sqlite3 libxml2-dev libxslt-dev autoconf libc6-dev ncurses-dev automake libtool bison subversion pkg-config python-software-properties software-properties-common
 
 # Install Oracle Java 7
 echo "Installing Oracle Java 7"
@@ -159,11 +159,11 @@ echo "Installing Ruby"
  apt-get -y install libgdbm-dev libffi-dev
 \curl -L https://get.rvm.io | bash -s stable
 source  /usr/local/rvm/scripts/rvm
-rvm install 1.9.3
+rvm install 1.9.3-p448
 
 # Install Ruby Gems
 echo "Installing Ruby Gems"
-rvm use 1.9.3
+rvm use 1.9.3-p448
 cd /opt/graylog2-web-interface
 gem install bundler --no-ri --no-rdoc
 bundle install
@@ -191,15 +191,15 @@ mongo graylog2 --eval "db.auth('grayloguser', 'password123')"
 
 # Install Apache-passenger
 echo Installing Apache-Passenger Modules
-rvm use 1.9.3
-gem install passenger
+rvm use 1.9.3-p448
+gem install --version '3.0.18' passenger
 passenger-install-apache2-module --auto
 
 
 # Add passenger modules for Apache2
 echo "Adding Apache Passenger modules to /etc/apache2/httpd.conf"
-echo  "LoadModule passenger_module /usr/local/rvm/gems/ruby-1.9.3-p448/gems/passenger-3.0.19/ext/apache2/mod_passenger.so" |  tee -a /etc/apache2/mods-available/passenger.load
-echo "PassengerRoot /usr/local/rvm/gems/ruby-1.9.3-p448/gems/passenger-3.0.19" |  tee -a /etc/apache2/mods-available/passenger.conf
+echo  "LoadModule passenger_module /usr/local/rvm/gems/ruby-1.9.3-p448/gems/passenger-3.0.18/ext/apache2/mod_passenger.so" |  tee -a /etc/apache2/mods-available/passenger.load
+echo "PassengerRoot /usr/local/rvm/gems/ruby-1.9.3-p448/gems/passenger-3.0.18" |  tee -a /etc/apache2/mods-available/passenger.conf
 echo "PassengerRuby /usr/local/rvm/wrappers/ruby-1.9.3-p448/ruby" |  tee -a /etc/apache2/mods-available/passenger.conf
 
 # Enable passenger modules
@@ -228,8 +228,8 @@ CustomLog /var/log/apache2/access.log combined
 
 # Enable virtualhost
 echo "Enabling Apache VirtualHost Settings"
-2dissite 000-default
-2ensite graylog2
+a2dissite 000-default
+a2ensite graylog2
 service apache2 reload
 
 # Restart apache
@@ -242,6 +242,9 @@ echo "Updating graylog2.conf"
 
 #Fixing issue with secret_toke in /opt/graylog2-web-interface/config/initializers/secret_token.rb
  sed -i -e "s|Graylog2WebInterface::Application.config.secret_token = 'CHANGE ME'|Graylog2WebInterface::Application.config.secret_token = 'b356d1af93673e37d6e21399d033d77c15354849fdde6d83fa0dca19608aa71f2fcd9d1f2784fb95e9400d8eeaf6dd9584d8d35b8f0b5c231369a70aac5e5777'|" /opt/graylog2-web-interface/config/initializers/secret_token.rb
+
+
+chown www-data.www-data /opt/graylog2-web-interface/ -R
 
 ## flush all rules on iptables!!!!!
 iptables -F -v
