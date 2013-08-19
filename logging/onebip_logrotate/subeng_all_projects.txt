@@ -1,0 +1,41 @@
+/var/log/subeng/*.log 
+/var/log/subeng/*.log[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]
+{
+          RETENTION_PERIOD
+          dateext
+		  missingok
+          ifempty
+          rotate TIME_TO_ROTATE
+          compress
+          olddir /var/log/subeng/old_logs
+          sharedscripts
+          firstaction
+          mkdir -p /var/log/subeng/old_logs
+          endscript
+          sharedscripts
+          lastaction
+          mkdir -p /mnt/subeng_log/$(date +%F) && mv /var/log/subeng/old_logs/*.gz /mnt/subeng_log/$(date +%F)          
+          endscript
+}
+
+
+/var/log/subeng-ultimate/*.log 
+/var/log/subeng-ultimate/*.log[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]
+{
+          RETENTION_PERIOD
+          dateext
+		  missingok
+          ifempty
+          rotate TIME_TO_ROTATE
+          compress
+          olddir /var/log/subeng-ultimate/old_logs
+          sharedscripts
+          firstaction
+          mkdir -p /var/log/subeng-ultimate/old_logs
+          endscript
+          sharedscripts
+          lastaction
+          mkdir -p /mnt/subeng-ultimate_log/$(date +%F) && mv /var/log/subeng-ultimate/old_logs/*.gz /mnt/subeng-ultimate_log/$(date +%F)
+          kill -HUP $(cat /var/run/apache2.pid)
+          endscript
+}

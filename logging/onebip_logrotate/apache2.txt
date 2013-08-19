@@ -1,0 +1,19 @@
+/var/log/apache2/*.log
+{
+          RETENTION_PERIOD
+          dateext
+          ifempty
+		  missingok
+          rotate TIME_TO_ROTATE
+          compress
+          olddir /var/log/apache2/old_logs
+          sharedscripts
+          firstaction
+          mkdir -p /var/log/apache/old_logs
+          endscript
+          sharedscripts
+          lastaction
+          mkdir -p /mnt/apache2_log/$(date +%F) && mv /var/log/apache2/old_logs/*.gz /mnt/apache2_log/$(date +%F)
+          kill -HUP $(cat /var/run/apache2.pid)
+          endscript
+}
