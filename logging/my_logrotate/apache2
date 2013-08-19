@@ -1,9 +1,9 @@
-/var/log/onebip/rest/*.log 
+/var/log/onebip/rest/*.log
 /var/log/onebip/rest/*.txt
 /var/log/onebip/rest/*.txt[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]
 {
           weekly
-	  dateext
+          dateext
           ifempty
           rotate 12
           compress
@@ -14,17 +14,17 @@
           endscript
           sharedscripts
           lastaction
-          mkdir -p /mnt/rest_log/$(date +%F) && mv /var/log/onebip/rest/old_logs/*.gz /mnt/rest_log/$(date +%F)                                                        
+          mkdir -p /mnt/rest_log/$(date +%F) && mv /var/log/onebip/rest/old_logs/*.gz /mnt/rest_log/$(date +%F)
           kill -HUP $(cat /var/run/apache2.pid)
           endscript
 }
 
-/var/log/onebip/front/*.log 
+/var/log/onebip/front/*.log
 /var/log/onebip/front/*.txt
 /var/log/onebip/front/*.txt[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]
 {
           weekly
-	  dateext
+          dateext
           ifempty
           rotate 12
           compress
@@ -35,17 +35,17 @@
           endscript
           sharedscripts
           lastaction
-          mkdir -p /mnt/front_log/$(date +%F) && mv /var/log/onebip/front/old_logs/*.gz /mnt/front_log/$(date +%F)                                                        
+          mkdir -p /mnt/front_log/$(date +%F) && mv /var/log/onebip/front/old_logs/*.gz /mnt/front_log/$(date +%F)
           kill -HUP $(cat /var/run/apache2.pid)
           endscript
 }
 
-/var/log/onebip/onebip/*.log 
+/var/log/onebip/onebip/*.log
 /var/log/onebip/onebip/*.txt
 /var/log/onebip/onebip/*.txt[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]
 {
           weekly
-	  dateext
+          dateext
           ifempty
           rotate 12
           compress
@@ -56,7 +56,7 @@
           endscript
           sharedscripts
           lastaction
-          mkdir -p /mnt/onebip_log/$(date +%F) && mv /var/log/onebip/onebip/old_logs/*.gz /mnt/onebip_log/$(date +%F)                                                        
+          mkdir -p /mnt/onebip_log/$(date +%F) && mv /var/log/onebip/onebip/old_logs/*.gz /mnt/onebip_log/$(date +%F)
           kill -HUP $(cat /var/run/apache2.pid)
           endscript
 }
@@ -65,18 +65,18 @@
 /var/log/apache2/*.log
 {
           weekly
-	  dateext
+          dateext
           ifempty
           rotate 12
           compress
           olddir /var/log/apache2/old_logs
           sharedscripts
           firstaction
-          mkdir -p /var/log/apache/old_logs 
+          mkdir -p /var/log/apache/old_logs
           endscript
           sharedscripts
           lastaction
-          mkdir -p /mnt/apache2_log/$(date +%F) && mv /var/log/apache2/old_logs/*.gz /mnt/apache2_log/$(date +%F)                                                        
+          mkdir -p /mnt/apache2_log/$(date +%F) && mv /var/log/apache2/old_logs/*.gz /mnt/apache2_log/$(date +%F)
           kill -HUP $(cat /var/run/apache2.pid)
           endscript
 }
