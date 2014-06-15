@@ -55,7 +55,7 @@ data['server-setting'].each do |id|
       responseDelete = httpDelete.request(reqDelete)
       puts "deleted server with id #{serverId} hostname #{hostname} and delete http status code : #{responseDelete.code} "
     else
-      puts "#{hostname} doesn't match criteria or reporting status is still active on the server #{hostname}"
+      puts "#{hostname} doesn't match criteria or still reporting"
     end
   end
 end
