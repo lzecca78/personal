@@ -13,6 +13,7 @@ ec2 = AWS::EC2.new(:region => ec2_region,
        puts "the snapshot #{snap_object.id} belongs to #{snap_object.volume_id} that doesn't exist anymore"
        snapshots_available = ec2.snapshots.filter('volume-id', snap_object.volume_id)
        snapshots_available.each do |snapold|
+       #Here you can do snapold.delete in order to delete the snapshot orphaned
        puts "#{snapold.id} can be also deleted because belongs to the same non existent volume_id : #{snap_object.volume_id}"
        end
    end
