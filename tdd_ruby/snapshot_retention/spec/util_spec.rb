@@ -28,4 +28,5 @@ describe Util do
             expect(@util.last_day_of_last_week(@from)).to eql(expected_date)
         end
     end
+
 end
