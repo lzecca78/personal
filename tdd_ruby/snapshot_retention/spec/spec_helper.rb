@@ -1,2 +1,2 @@
 #!/usr/bin/env ruby
-require_relative '../util'
+require_relative '../date_util'
